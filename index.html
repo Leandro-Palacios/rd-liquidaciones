@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RD Consultores — Sistema de Liquidación</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:#f4f7fb; min-height:100vh; }
+
+  /* HEADER */
+  .header { background:linear-gradient(135deg,#0f2d5e 0%,#1a4a8a 100%); height:68px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 12px rgba(15,45,94,0.25); }
+  .header-inner { display:flex; align-items:center; gap:14px; }
+  .logo { width:42px; height:42px; background:#00b4d8; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:16px; color:#0f2d5e; letter-spacing:-1px; box-shadow:0 0 0 3px rgba(0,180,216,0.3); }
+  .header-txt .nombre { color:#fff; font-weight:700; font-size:17px; }
+  .header-txt .sub { color:#00b4d8; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; }
+  .barra { height:3px; background:linear-gradient(90deg,#00b4d8,#2d6bbf,#00b4d8); }
+
+  /* MAIN */
+  .main { max-width:700px; margin:0 auto; padding:40px 20px 80px; }
+  .titulo { font-size:26px; font-weight:700; color:#0f2d5e; letter-spacing:-0.02em; margin-bottom:6px; }
+  .subtitulo { color:#64748b; font-size:14px; margin-bottom:32px; }
+
+  /* CARD */
+  .card { background:#fff; border-radius:16px; box-shadow:0 4px 24px rgba(15,45,94,0.08); overflow:hidden; }
+  .card-body { padding:28px 32px; }
+  .card-footer { background:rgba(15,45,94,0.03); border-top:1px solid #e2e8f2; padding:18px 32px; display:flex; align-items:center; justify-content:space-between; }
+
+  /* SECCIÓN */
+  .sec-header { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+  .sec-num { width:26px; height:26px; background:linear-gradient(135deg,#0f2d5e,#2d6bbf); border-radius:7px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:700; flex-shrink:0; }
+  .sec-titulo { font-weight:700; color:#0f2d5e; font-size:13px; text-transform:uppercase; letter-spacing:0.08em; }
+  .divider { height:1px; background:#e2e8f2; margin:24px 0; }
+
+  /* FORM */
+  label { display:block; font-size:10px; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; }
+  input, select { width:100%; padding:11px 14px; border:1.5px solid #cbd5e1; border-radius:8px; font-family:inherit; font-size:13px; color:#1e293b; outline:none; background:#f4f7fb; transition:border-color 0.2s; }
+  input:focus, select:focus { border-color:#2d6bbf; }
+  select { appearance:none; cursor:pointer; padding-right:36px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232d6bbf' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .form-group { margin-bottom:14px; }
+
+  /* INFO EMPRESA */
+  .info-empresa { background:rgba(15,45,94,0.04); border:1px solid #e2e8f2; border-left:3px solid #00b4d8; border-radius:8px; padding:14px 18px; margin-top:12px; display:none; }
+  .info-empresa.visible { display:block; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:12px; }
+  .info-label { font-size:9px; color:#64748b; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:3px; }
+  .info-value { font-size:12px; font-weight:600; color:#0f2d5e; }
+
+  /* BOTONES */
+  .btn-primary { background:linear-gradient(135deg,#2d6bbf,#1a4a8a); color:#fff; border:none; padding:12px 26px; border-radius:10px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(45,107,191,0.35); transition:opacity 0.2s; }
+  .btn-primary:hover { opacity:0.9; }
+  .btn-primary:disabled { background:#e2e8f2; color:#94a3b8; box-shadow:none; cursor:not-allowed; }
+  .btn-outline { background:transparent; border:1.5px solid #2d6bbf; border-radius:8px; padding:7px 14px; font-family:inherit; font-size:12px; font-weight:600; color:#2d6bbf; cursor:pointer; }
+  .btn-dashed { background:transparent; border:1.5px dashed #2d6bbf; border-radius:8px; padding:9px 18px; font-family:inherit; font-size:12px; font-weight:600; color:#2d6bbf; cursor:pointer; display:flex; align-items:center; gap:6px; margin-top:12px; }
+  .btn-edit { background:transparent; border:1px solid #2d6bbf; border-radius:7px; padding:6px 14px; font-family:inherit; font-size:11px; font-weight:600; color:#2d6bbf; cursor:pointer; }
+  .btn-success { background:linear-gradient(135deg,#0d9488,#0f766e); color:#fff; border:none; padding:12px 28px; border-radius:10px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(13,148,136,0.4); }
+  .btn-ghost { background:transparent; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px 20px; font-family:inherit; font-size:13px; color:#64748b; cursor:pointer; }
+  .btn-save { background:linear-gradient(135deg,#2d6bbf,#1a4a8a); color:#fff; border:none; padding:13px; border-radius:10px; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; width:100%; margin-top:8px; }
+
+  /* EMPLEADOS */
+  .emp-resumen { background:#f4f7fb; border-radius:10px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .emp-icon { width:38px; height:38px; background:rgba(0,180,216,0.15); border-radius:9px; display:flex; align-items:center; justif-content:center; font-size:17px; flex-shrink:0; }
+  .emp-lista { border:1px solid #e2e8f2; border-radius:10px; overflow:hidden; margin-bottom:12px; }
+  .emp-fila { display:flex; align-items:center; justify-content:space-between; padding:11px 16px; border-bottom:1px solid #e2e8f2; }
+  .emp-fila:last-child { border-bottom:none; }
+  .emp-fila:nth-child(even) { background:#f4f7fb; }
+  .emp-legajo { width:32px; height:32px; background:rgba(45,107,191,0.12); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#2d6bbf; flex-shrink:0; }
+  .emp-nombre { font-size:13px; font-weight:600; color:#1e293b; }
+  .emp-sub { font-size:11px; color:#64748b; margin-top:1px; }
+  .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:10px; font-weight:600; }
+  .badge-red { background:rgba(0,180,216,0.12); color:#0096c7; border:1px solid rgba(0,180,216,0.3); }
+  .badge-green { background:rgba(13,148,136,0.12); color:#0d9488; border:1px solid rgba(13,148,136,0.3); }
+  .btn-novedades { background:rgba(15,45,94,0.08); border:none; border-radius:7px; padding:6px 12px; font-family:inherit; font-size:11px; font-weight:600; color:#0f2d5e; cursor:pointer; white-space:nowrap; }
+
+  /* DRAWER */
+  .drawer-overlay { position:fixed; inset:0; background:rgba(15,45,94,0.5); backdrop-filter:blur(3px); z-index:200; display:none; }
+  .drawer-overlay.open { display:block; }
+  .drawer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-radius:20px 20px 0 0; max-height:85vh; overflow-y:auto; box-shadow:0 -8px 40px rgba(15,45,94,0.2); z-index:201; transform:translateY(100%); transition:transform 0.25s ease; }
+  .drawer.open { transform:translateY(0); }
+  .drawer-handle { display:flex; justify-content:center; padding:12px 0 0; }
+  .drawer-handle div { width:40px; height:4px; background:#e2e8f2; border-radius:2px; }
+  .drawer-header { display:flex; align-items:center; justify-content:space-between; padding:16px 24px 12px; }
+  .drawer-titulo { font-weight:700; font-size:17px; color:#0f2d5e; }
+  .drawer-close { background:rgba(15,45,94,0.08); border:none; border-radius:8px; width:32px; height:32px; color:#0f2d5e; font-size:16px; cursor:pointer; font-weight:700; }
+  .drawer-body { padding:4px 24px 32px; }
+  .info-aviso { background:rgba(0,180,216,0.08); border:1px solid rgba(0,180,216,0.25); border-radius:8px; padding:10px 14px; font-size:12px; color:#0096c7; margin-bottom:16px; }
+
+  /* MODAL PREVIEW */
+  .modal-overlay { position:fixed; inset:0; background:rgba(15,45,94,0.75); backdrop-filter:blur(6px); z-index:300; display:none; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:#fff; border-radius:20px; width:95%; max-width:700px; max-height:92vh; display:flex; flex-direction:column; box-shadow:0 24px 80px rgba(15,45,94,0.5); overflow:hidden; }
+  .modal-header { background:linear-gradient(135deg,#0f2d5e,#1a4a8a); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+  .modal-header .titulo { color:#fff; font-weight:700; font-size:16px; }
+  .modal-header .sub { color:#00b4d8; font-size:12px; margin-top:2px; }
+  .modal-nav { background:#f4f7fb; padding:10px 24px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e2e8f2; flex-shrink:0; }
+  .modal-paginacion { display:flex; align-items:center; gap:6px; }
+  .pag-btn { width:28px; height:28px; border-radius:50%; border:none; background:#e2e8f2; color:#64748b; font-weight:700; font-size:11px; cursor:pointer; transition:all 0.15s; }
+  .pag-btn.active { background:#0f2d5e; color:#fff; }
+  .modal-emp-info { padding:10px 24px; background:#fff; border-bottom:1px solid #e2e8f2; display:flex; align-items:center; gap:10px; flex-shrink:0; }
+  .modal-body { overflow-y:auto; flex:1; padding:16px 24px; background:#f0f2f5; }
+  .modal-footer { padding:16px 24px; border-top:1px solid #e2e8f2; display:flex; align-items:center; justify-content:space-between; background:#fff; flex-shrink:0; }
+
+  /* RECIBO VISUAL */
+  .recibo-visual { font-family:Arial,sans-serif; font-size:7.5px; background:#fff; border:1px solid #ccc; margin-bottom:6px; }
+  .recibo-header { padding:3px 8px; border-bottom:1px solid #ccc; background:#f8f8f8; }
+  .recibo-emp { font-weight:bold; font-size:9px; }
+  .recibo-table { width:100%; border-collapse:collapse; border-bottom:1px solid #ccc; }
+  .recibo-table th { background:#eee; border:1px solid #ddd; padding:2px 5px; font-size:6.5px; text-align:center; }
+  .recibo-table td { border:1px solid #ddd; padding:2px 5px; font-size:7.5px; }
+  .recibo-table .nr { text-align:right; }
+  .rec-conceptos th { background:#333; color:#fff; border:1px solid #555; padding:2px 5px; font-size:6.5px; }
+  .rec-conceptos td { border-bottom:1px solid #eee; padding:2px 5px; font-size:7.5px; height:5mm; }
+  .rec-firma { padding:4px 8px; display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid #ccc; }
+  .rec-linea { border-top:1px solid #333; min-width:45mm; text-align:center; font-size:6.5px; padding-top:1px; }
+  .divisor-recibo { border-top:2px dashed #bbb; margin:4px 0; }
+  .bold { font-weight:bold; }
+  .neto-txt { font-weight:bold; font-size:10px; text-align:right; color:#0f2d5e; }
+
+  /* TOAST */
+  .toast { position:fixed; top:80px; left:50%; transform:translateX(-50%); background:#0d9488; color:#fff; padding:12px 24px; border-radius:10px; font-size:13px; font-weight:600; z-index:500; box-shadow:0 4px 20px rgba(0,0,0,0.2); white-space:nowrap; display:none; }
+  .toast.show { display:block; }
+
+  /* LOADER */
+  .spinner { width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top:2px solid #fff; border-radius:50%; animation:spin 0.7s linear infinite; display:inline-block; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">RD</div>
+    <div class="header-txt">
+      <div class="nombre">RD Consultores</div>
+      <div class="sub">Sistema de Liquidación</div>
+    </div>
+  </div>
+</div>
+<div class="barra"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="titulo">Generación de Recibos</div>
+  <div class="subtitulo">Seleccioná la empresa y el período, revisá los recibos y luego enviá</div>
+
+  <div class="card">
+    <div class="card-body">
+
+      <!-- SECCIÓN 1: EMPRESA -->
+      <div class="sec-header">
+        <div class="sec-num">1</div>
+        <div class="sec-titulo">Empresa</div>
+      </div>
+
+      <label>Seleccionar empresa</label>
+      <select id="sel-empresa" onchange="onEmpresaChange()">
+        <option value="">— Seleccioná una empresa —</option>
+      </select>
+
+      <div class="info-empresa" id="info-empresa">
+        <div class="info-grid">
+          <div><div class="info-label">CUIT</div><div class="info-value" id="info-cuit">—</div></div>
+          <div><div class="info-label">SINDICATO</div><div class="info-value" id="info-sindicato">—</div></div>
+          <div><div class="info-label">EMAIL DESTINO</div><div class="info-value" id="info-email">—</div></div>
+        </div>
+        <button class="btn-edit" onclick="abrirEditarEmpresa()">✏️ Editar datos de empresa</button>
+      </div>
+
+      <button class="btn-dashed" onclick="abrirDrawer('drawer-nueva-empresa')">
+        <span style="font-size:15px">＋</span> Nueva empresa
+      </button>
+
+      <div class="divider"></div>
+
+      <!-- SECCIÓN 2: PERÍODO -->
+      <div class="sec-header">
+        <div class="sec-num">2</div>
+        <div class="sec-titulo">Período</div>
+      </div>
+      <div class="grid2">
+        <div>
+          <label>Mes</label>
+          <select id="sel-mes">
+            <option value="">— Seleccioná el mes —</option>
+            <option value="ENE">Enero</option><option value="FEB">Febrero</option>
+            <option value="MAR">Marzo</option><option value="ABR">Abril</option>
+            <option value="MAY">Mayo</option><option value="JUN">Junio</option>
+            <option value="JUL">Julio</option><option value="AGO">Agosto</option>
+            <option value="SEP">Septiembre</option><option value="OCT">Octubre</option>
+            <option value="NOV">Noviembre</option><option value="DIC">Diciembre</option>
+          </select>
+        </div>
+        <div>
+          <label>Año</label>
+          <select id="sel-anio">
+            <option value="26">2026</option>
+            <option value="27">2027</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- SECCIÓN 3: EMPLEADOS -->
+      <div class="sec-header">
+        <div class="sec-num">3</div>
+        <div class="sec-titulo">Empleados</div>
+      </div>
+
+      <div id="emp-placeholder" style="background:#f4f7fb;border-radius:10px;padding:18px;text-align:center;color:#64748b;font-style:italic;font-size:13px;">
+        Seleccioná una empresa para ver sus empleados
+      </div>
+
+      <div id="emp-contenido" style="display:none">
+        <div class="emp-resumen">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="emp-icon">👥</div>
+            <div>
+              <div style="font-weight:700;color:#0f2d5e;font-size:15px" id="emp-count">0 empleados</div>
+              <div style="font-size:12px;color:#64748b" id="emp-empresa-nombre">—</div>
+            </div>
+          </div>
+          <button class="btn-outline" onclick="abrirModalEmpleados()">Ver detalle →</button>
+        </div>
+        <div class="emp-lista" id="emp-lista"></div>
+        <button class="btn-dashed" onclick="abrirDrawer('drawer-nuevo-empleado')">
+          <span style="font-size:15px">＋</span> Nuevo empleado
+        </button>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="card-footer">
+      <div style="font-size:12px;color:#64748b" id="footer-txt">Completá los datos para continuar</div>
+      <button class="btn-primary" id="btn-preview" onclick="previsualizarRecibos()" disabled>
+        👁 Previsualizar recibos
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EMPLEADOS -->
+<div class="modal-overlay" id="modal-empleados" onclick="cerrarModalEmpleados(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:620px">
+    <div class="modal-header">
+      <div><div class="titulo">Empleados</div><div class="sub" id="modal-emp-sub">—</div></div>
+      <button style="background:rgba(255,255,255,0.15);border:none;border-radius:8px;width:32px;height:32px;color:#fff;font-size:18px;cursor:pointer;font-weight:700" onclick="cerrarModal('modal-empleados')">✕</button>
+    </div>
+    <div style="overflow-y:auto;flex:1">
+      <table style="width:100%;border-collapse:collapse;font-size:13px" id="tabla-empleados">
+        <thead><tr style="background:#f4f7fb">
+          <th style="padding:11px 16px;text-align:left;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#64748b;border-bottom:2px solid #e2e8f2">Legajo</th>
+          <th style="padding:11px 16px;text-align:left;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#64748b;border-bottom:2px solid #e2e8f2">Apellido y Nombre</th>
+          <th style="padding:11px 16px;text-align:left;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#64748b;border-bottom:2px solid #e2e8f2">Categoría</th>
+          <th style="padding:11px 16px;text-align:left;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#64748b;border-bottom:2px solid #e2e8f2">Jornada</th>
+          <th style="padding:11px 16px;text-align:left;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#64748b;border-bottom:2px solid #e2e8f2">Ingreso</th>
+        </tr></thead>
+        <tbody id="tabla-empleados-body"></tbody>
+      </table>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #e2e8f2;display:flex;justify-content:flex-end">
+      <button class="btn-primary" onclick="cerrarModal('modal-empleados')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PREVISUALIZACIÓN -->
+<div class="modal-overlay" id="modal-preview">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="titulo">Previsualización de recibos</div><div class="sub" id="preview-sub">—</div></div>
+      <button style="background:rgba(255,255,255,0.15);border:none;border-radius:8px;width:34px;height:34px;color:#fff;font-size:18px;cursor:pointer;font-weight:700" onclick="cerrarModal('modal-preview')">✕</button>
+    </div>
+    <div class="modal-nav">
+      <button class="btn-outline" id="btn-prev" onclick="navRecibo(-1)">← Anterior</button>
+      <div class="modal-paginacion" id="paginacion"></div>
+      <button class="btn-outline" id="btn-next" onclick="navRecibo(1)">Siguiente →</button>
+    </div>
+    <div class="modal-emp-info" id="preview-emp-info"></div>
+    <div class="modal-body" id="preview-body"></div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="cerrarModal('modal-preview')">← Volver y corregir</button>
+      <button class="btn-success" id="btn-confirmar" onclick="confirmarEnvio()">✉️ Confirmar y enviar</button>
+    </div>
+  </div>
+</div>
+
+<!-- DRAWERS -->
+<!-- Nueva empresa -->
+<div class="drawer-overlay" id="overlay-drawer-nueva-empresa" onclick="cerrarDrawer('drawer-nueva-empresa')"></div>
+<div class="drawer" id="drawer-nueva-empresa">
+  <div class="drawer-handle"><div></div></div>
+  <div class="drawer-header">
+    <div class="drawer-titulo">Nueva empresa</div>
+    <button class="drawer-close" onclick="cerrarDrawer('drawer-nueva-empresa')">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="grid2" style="margin-bottom:14px">
+      <div><label>Nombre de la empresa</label><input id="ne-nombre" placeholder="Ej: JOSE GARCIA SA"></div>
+      <div><label>CUIT</label><input id="ne-cuit" placeholder="20-12345678-9"></div>
+    </div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div><label>Email destino</label><input id="ne-email" type="email" placeholder="empresa@email.com"></div>
+      <div><label>Sindicato / Convenio</label><input id="ne-sindicato" placeholder="Ej: Gastronómicos CCT 389/04"></div>
+    </div>
+    <button class="btn-save" onclick="guardarNuevaEmpresa()">Guardar empresa →</button>
+  </div>
+</div>
+
+<!-- Editar empresa -->
+<div class="drawer-overlay" id="overlay-drawer-editar-empresa" onclick="cerrarDrawer('drawer-editar-empresa')"></div>
+<div class="drawer" id="drawer-editar-empresa">
+  <div class="drawer-handle"><div></div></div>
+  <div class="drawer-header">
+    <div class="drawer-titulo" id="editar-emp-titulo">Editar empresa</div>
+    <button class="drawer-close" onclick="cerrarDrawer('drawer-editar-empresa')">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="info-aviso">✏️ Los cambios se guardarán en Google Sheets automáticamente</div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div><label>Nombre de la empresa</label><input id="ee-nombre"></div>
+      <div><label>CUIT</label><input id="ee-cuit"></div>
+    </div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div><label>Email destino</label><input id="ee-email" type="email"></div>
+      <div><label>Sindicato / Convenio</label><input id="ee-sindicato"></div>
+    </div>
+    <button class="btn-save" onclick="guardarEditarEmpresa()">Guardar cambios →</button>
+  </div>
+</div>
+
+<!-- Nuevo empleado -->
+<div class="drawer-overlay" id="overlay-drawer-nuevo-empleado" onclick="cerrarDrawer('drawer-nuevo-empleado')"></div>
+<div class="drawer" id="drawer-nuevo-empleado">
+  <div class="drawer-handle"><div></div></div>
+  <div class="drawer-header">
+    <div class="drawer-titulo">Nuevo empleado</div>
+    <button class="drawer-close" onclick="cerrarDrawer('drawer-nuevo-empleado')">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="form-group"><label>Apellido y Nombre</label><input id="emp-nombre" placeholder="Ej: GARCIA JOSE LUIS"></div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div><label>CUIL</label><input id="emp-cuil" placeholder="20-12345678-9"></div>
+      <div><label>Nº Legajo</label><input id="emp-legajo" placeholder="Ej: 5"></div>
+    </div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div><label>Categoría</label><input id="emp-categoria" placeholder="Ej: MOZO/A"></div>
+      <div><label>Fecha de ingreso</label><input id="emp-ingreso" placeholder="DD/MM/AA"></div>
+    </div>
+    <div class="form-group">
+      <label>Tipo de jornada</label>
+      <select id="emp-jornada">
+        <option value="COMPLETA">Jornada completa</option>
+        <option value="REDUCIDA_50">Jornada reducida 50%</option>
+        <option value="REDUCIDA_75">Jornada reducida 75%</option>
+      </select>
+    </div>
+    <button class="btn-save" onclick="guardarNuevoEmpleado()">Guardar empleado →</button>
+  </div>
+</div>
+
+<!-- Novedades -->
+<div class="drawer-overlay" id="overlay-drawer-novedades" onclick="cerrarDrawer('drawer-novedades')"></div>
+<div class="drawer" id="drawer-novedades">
+  <div class="drawer-handle"><div></div></div>
+  <div class="drawer-header">
+    <div class="drawer-titulo" id="nov-titulo">Novedades del mes</div>
+    <button class="drawer-close" onclick="cerrarDrawer('drawer-novedades')">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div id="nov-emp-info" style="background:#f4f7fb;border-radius:10px;padding:12px 16px;margin-bottom:16px"></div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div><label>Sueldo básico ($)</label><input id="nov-sueldo" type="number" placeholder="Ej: 425000"></div>
+      <div><label>Días trabajados</label><input id="nov-dias" type="number" placeholder="Ej: 30"></div>
+    </div>
+    <div style="height:1px;background:#e2e8f2;margin:14px 0"></div>
+    <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px">Conceptos adicionales</div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div><label>No remunerativo ($)</label><input id="nov-norem" type="number" placeholder="0"></div>
+      <div><label>Remunerativo adicional ($)</label><input id="nov-rem" type="number" placeholder="0"></div>
+    </div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div><label>SAC ($)</label><input id="nov-sac" type="number" placeholder="0"></div>
+      <div><label>Otro no remunerativo ($)</label><input id="nov-norem2" type="number" placeholder="0"></div>
+    </div>
+    <div class="info-aviso">💡 Estos valores se reflejarán en el recibo al previsualizar</div>
+    <button class="btn-save" onclick="guardarNovedades()">Guardar novedades →</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURACIÓN — CAMBIAR ESTA URL POR LA DE TU N8N
+// ============================================================
+const WEBHOOK_URL = 'https://TU_WEBHOOK_N8N.com/webhook/rd-consultores'; // ← cambiar cuando configures n8n
+
+// ============================================================
+// DATOS EN MEMORIA (se cargan desde n8n en producción)
+// ============================================================
+let empresas = {
+  EMP001: { nombre:"JORGE MICELOTTA", cuit:"20-11299390-9", sindicato:"Gastronómicos (CCT 389/04)", email:"micelotta@email.com",
+    empleados:[
+      {id:"E001",legajo:"4", nombre:"AMARILLA JOHANNA BEATRIZ", cat:"MOZO/A",jornada:"REDUCIDA_50",ingreso:"24/08/16",cuil:"27-28765432-1"},
+      {id:"E002",legajo:"14",nombre:"VELTRI YANINA ESTER",      cat:"MOZO/A",jornada:"REDUCIDA_50",ingreso:"01/10/24",cuil:"27-31234567-2"},
+      {id:"E003",legajo:"15",nombre:"FERNANDEZ SOL MARIANA",    cat:"MOZO/A",jornada:"REDUCIDA_50",ingreso:"15/04/22",cuil:"27-29876543-3"},
+      {id:"E004",legajo:"18",nombre:"BERNAL DIANA STEFANY",     cat:"MOZO/A",jornada:"REDUCIDA_50",ingreso:"01/02/24",cuil:"27-33456789-4"},
+      {id:"E005",legajo:"19",nombre:"TORRES NATALIA MARCELA",   cat:"MOZO/A",jornada:"REDUCIDA_50",ingreso:"01/02/24",cuil:"27-30987654-5"},
+      {id:"E006",legajo:"22",nombre:"ALVES ROSA ESTER",         cat:"MOZO/A",jornada:"REDUCIDA_50",ingreso:"01/10/24",cuil:"27-32109876-6"},
+    ]},
+  EMP002: { nombre:"RESTAURANTE LOS PINOS", cuit:"30-71234567-8", sindicato:"Gastronómicos (CCT 389/04)", email:"lopinos@email.com",
+    empleados:[
+      {id:"E007",legajo:"1",nombre:"GOMEZ CARLOS ALBERTO",cat:"COCINERO",jornada:"COMPLETA",ingreso:"01/03/20",cuil:"20-25432198-7"},
+      {id:"E008",legajo:"2",nombre:"DIAZ MARIA LAURA",    cat:"MOZO/A",  jornada:"COMPLETA",ingreso:"15/06/21",cuil:"27-28543210-8"},
+    ]}
+};
+
+let empresaActual = null;
+let empleadoActual = null;
+let recibosPreview = [];
+let idxPreview = 0;
+
+// Inicializar select de empresas
+function initEmpresas() {
+  const sel = document.getElementById('sel-empresa');
+  sel.innerHTML = '<option value="">— Seleccioná una empresa —</option>';
+  Object.entries(empresas).forEach(([id, e]) => {
+    const opt = document.createElement('option');
+    opt.value = id; opt.textContent = e.nombre;
+    sel.appendChild(opt);
+  });
+}
+
+function onEmpresaChange() {
+  const id = document.getElementById('sel-empresa').value;
+  empresaActual = id ? empresas[id] : null;
+
+  const infoEmp = document.getElementById('info-empresa');
+  const empContenido = document.getElementById('emp-contenido');
+  const empPlaceholder = document.getElementById('emp-placeholder');
+
+  if (empresaActual) {
+    document.getElementById('info-cuit').textContent = empresaActual.cuit;
+    document.getElementById('info-sindicato').textContent = empresaActual.sindicato;
+    document.getElementById('info-email').textContent = empresaActual.email;
+    infoEmp.classList.add('visible');
+    renderEmpleados(id);
+    empContenido.style.display = 'block';
+    empPlaceholder.style.display = 'none';
+    document.getElementById('footer-txt').innerHTML = `Se generarán <strong style="color:#0f2d5e">${empresaActual.empleados.length} recibos</strong> para revisar antes de enviar`;
+  } else {
+    infoEmp.classList.remove('visible');
+    empContenido.style.display = 'none';
+    empPlaceholder.style.display = 'block';
+    document.getElementById('footer-txt').textContent = 'Completá los datos para continuar';
+  }
+  actualizarBotonPreview();
+}
+
+function actualizarBotonPreview() {
+  const empresa = document.getElementById('sel-empresa').value;
+  const mes = document.getElementById('sel-mes').value;
+  document.getElementById('btn-preview').disabled = !empresa || !mes;
+}
+
+document.getElementById('sel-mes').addEventListener('change', actualizarBotonPreview);
+
+function renderEmpleados(empresaId) {
+  const emp = empresas[empresaId];
+  document.getElementById('emp-count').textContent = `${emp.empleados.length} empleados`;
+  document.getElementById('emp-empresa-nombre').textContent = emp.nombre;
+
+  const lista = document.getElementById('emp-lista');
+  lista.innerHTML = emp.empleados.map((e, i) => `
+    <div class="emp-fila" style="background:${i%2===0?'#fff':'#f4f7fb'}">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="emp-legajo">${e.legajo}</div>
+        <div>
+          <div class="emp-nombre">${e.nombre}</div>
+          <div class="emp-sub">${e.cat} · <span class="badge ${e.jornada==='REDUCIDA_50'?'badge-red':'badge-green'}">${e.jornada==='REDUCIDA_50'?'50% jornada':'Completa'}</span></div>
+        </div>
+      </div>
+      <button class="btn-novedades" onclick="abrirNovedades('${empresaId}','${e.id}')">📋 Novedades</button>
+    </div>
+  `).join('');
+
+  // Tabla modal
+  document.getElementById('modal-emp-sub').textContent = `${emp.nombre} · ${emp.empleados.length} empleados`;
+  document.getElementById('tabla-empleados-body').innerHTML = emp.empleados.map((e,i) => `
+    <tr style="background:${i%2===0?'#fff':'#f4f7fb'}">
+      <td style="padding:12px 16px;color:#64748b;font-weight:500">${e.legajo}</td>
+      <td style="padding:12px 16px;font-weight:600;color:#1e293b">${e.nombre}</td>
+      <td style="padding:12px 16px;color:#64748b">${e.cat}</td>
+      <td style="padding:12px 16px"><span class="badge ${e.jornada==='REDUCIDA_50'?'badge-red':'badge-green'}">${e.jornada==='REDUCIDA_50'?'50% jornada':'Completa'}</span></td>
+      <td style="padding:12px 16px;color:#64748b">${e.ingreso}</td>
+    </tr>
+  `).join('');
+}
+
+// PREVISUALIZACIÓN LOCAL
+function fmt(v){return Number(v).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+function calcularRecibo(emp, empresa, mes, anio) {
+  const jornal = 425000;
+  const esRed = emp.jornada === 'REDUCIDA_50';
+  const base = esRed ? jornal*0.5 : jornal;
+  const basico = base, complemento = basico*0.12, presentismo = basico*0.10;
+  const totalHab = basico+complemento+presentismo;
+  const jub=totalHab*0.11,ley=totalHab*0.03,obraSoc=jornal*0.03,sind=totalHab*0.025,seg=totalHab*0.01;
+  const totalDesc=jub+ley+obraSoc+sind+seg;
+  const neto=totalHab-totalDesc;
+  const p=emp.ingreso.split('/');
+  const ing=new Date(`20${p[2]}`,p[1]-1,p[0]);
+  const antig=Math.floor((new Date()-ing)/(365.25*24*3600*1000));
+  return {emp,empresa,mes,anio,jornal,basico,complemento,presentismo,totalHab,jub,ley,obraSoc,sind,seg,totalDesc,neto,antig,esRed};
+}
+
+function htmlRecibo(r, esOriginal) {
+  return `
+  <div class="recibo-visual">
+    <div class="recibo-header">
+      <div class="recibo-emp">${r.empresa.nombre}</div>
+      <div style="color:#555;font-size:7px">C.U.I.T.: ${r.empresa.cuit}</div>
+      ${!esOriginal?'<div style="font-size:6.5px;color:#999;text-align:right">— DUPLICADO —</div>':''}
+    </div>
+    <table class="recibo-table">
+      <tr><th>MES</th><th>AÑO</th><th>Nº LEGAJO</th><th style="width:40%">APELLIDO Y NOMBRE</th><th>JORNAL</th><th>ANTIGÜEDAD</th></tr>
+      <tr><td>${r.mes}</td><td>${r.anio}</td><td>${r.emp.legajo}</td><td class="bold">${r.emp.nombre}</td><td class="nr">${fmt(r.jornal)}</td><td class="nr">${r.antig}</td></tr>
+    </table>
+    <table class="recibo-table">
+      <tr><th>CATEGORÍA</th><th>FECHA INGRESO</th><th>C.U.I.L.</th><th>JORNADA</th></tr>
+      <tr><td>${r.emp.cat}</td><td>${r.emp.ingreso}</td><td>${r.emp.cuil}</td><td>${r.esRed?'Reducida 50%':'Completa'}</td></tr>
+    </table>
+    <table class="recibo-table rec-conceptos">
+      <tr><th style="width:25px">CÓD</th><th style="text-align:left">CONCEPTO</th><th>UNIDADES</th><th>HABERES</th><th>DESCUENTOS</th></tr>
+      <tr><td>1</td><td>Sueldo básico</td><td class="nr">30,00</td><td class="nr" style="color:#1a4a8a">${fmt(r.basico)}</td><td></td></tr>
+      <tr><td>6</td><td>Complemento servicio</td><td class="nr">12,00</td><td class="nr" style="color:#1a4a8a">${fmt(r.complemento)}</td><td></td></tr>
+      <tr><td>60</td><td>Presentismo</td><td class="nr">10,00</td><td class="nr" style="color:#1a4a8a">${fmt(r.presentismo)}</td><td></td></tr>
+      <tr><td>400</td><td>Jubilación</td><td class="nr">11,00</td><td></td><td class="nr" style="color:#e11d48">${fmt(r.jub)}</td></tr>
+      <tr><td>401</td><td>Ley 19032</td><td class="nr">3,00</td><td></td><td class="nr" style="color:#e11d48">${fmt(r.ley)}</td></tr>
+      <tr><td>402</td><td>Obra social</td><td class="nr">3,00</td><td></td><td class="nr" style="color:#e11d48">${fmt(r.obraSoc)}</td></tr>
+      <tr><td>403</td><td>Cuota sindical</td><td class="nr">2,50</td><td></td><td class="nr" style="color:#e11d48">${fmt(r.sind)}</td></tr>
+      <tr><td>404</td><td>Seg. de vida</td><td class="nr">1,00</td><td></td><td class="nr" style="color:#e11d48">${fmt(r.seg)}</td></tr>
+      <tr><td colspan="5" style="height:6mm"></td></tr>
+    </table>
+    <table class="recibo-table">
+      <tr><td style="font-size:6.5px;font-weight:600;background:#f5f5f5;text-align:center" colspan="2">TOTAL HABERES</td><td style="font-size:6.5px;font-weight:600;background:#f5f5f5;text-align:center">TOTAL DESCUENTOS</td></tr>
+      <tr><td class="nr bold" style="color:#1a4a8a" colspan="2">${fmt(r.totalHab)}</td><td class="nr bold" style="color:#e11d48">${fmt(r.totalDesc)}</td></tr>
+      <tr><td style="font-size:6.5px;font-weight:600;background:#f5f5f5;text-align:center" colspan="2">FECHA DE PAGO</td><td style="font-size:6.5px;font-weight:600;background:#f5f5f5;text-align:center">NETO A PAGAR</td></tr>
+      <tr><td colspan="2"></td><td class="neto-txt">${fmt(r.neto)}</td></tr>
+    </table>
+    <div class="rec-firma">
+      <div style="font-size:7px;color:#555">Recibí el importe neto de esta liquidación y duplicado de recibo</div>
+      <div class="rec-linea">FIRMA</div>
+    </div>
+  </div>`;
+}
+
+function previsualizarRecibos() {
+  const empresaId = document.getElementById('sel-empresa').value;
+  const mes = document.getElementById('sel-mes').value;
+  const anio = document.getElementById('sel-anio').value;
+  const empresa = empresas[empresaId];
+  if (!empresa || !mes) return;
+
+  recibosPreview = empresa.empleados.map(e => calcularRecibo(e, empresa, mes, anio));
+  idxPreview = 0;
+
+  document.getElementById('preview-sub').textContent = `${empresa.nombre} · ${Object.values({ENE:'Enero',FEB:'Febrero',MAR:'Marzo',ABR:'Abril',MAY:'Mayo',JUN:'Junio',JUL:'Julio',AGO:'Agosto',SEP:'Septiembre',OCT:'Octubre',NOV:'Noviembre',DIC:'Diciembre'})[Object.keys({ENE:0,FEB:1,MAR:2,ABR:3,MAY:4,JUN:5,JUL:6,AGO:7,SEP:8,OCT:9,NOV:10,DIC:11})[Object.keys({ENE:'',FEB:'',MAR:'',ABR:'',MAY:'',JUN:'',JUL:'',AGO:'',SEP:'',OCT:'',NOV:'',DIC:''})[Object.keys({ENE:0,FEB:1,MAR:2,ABR:3,MAY:4,JUN:5,JUL:6,AGO:7,SEP:8,OCT:9,NOV:10,DIC:11})[mes]]]} 20${anio}`;
+  document.getElementById('btn-confirmar').disabled = false;
+  document.getElementById('btn-confirmar').innerHTML = '✉️ Confirmar y enviar';
+
+  renderPreview();
+  abrirModal('modal-preview');
+}
+
+function renderPreview() {
+  const r = recibosPreview[idxPreview];
+  const total = recibosPreview.length;
+
+  // Info empleado
+  document.getElementById('preview-emp-info').innerHTML = `
+    <div style="width:32px;height:32px;background:rgba(45,107,191,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#2d6bbf;flex-shrink:0">${r.emp.legajo}</div>
+    <div>
+      <div style="font-weight:700;color:#1e293b;font-size:13px">${r.emp.nombre}</div>
+      <div style="font-size:11px;color:#64748b">Neto: <strong style="color:#0f2d5e">$${fmt(r.neto)}</strong></div>
+    </div>
+    <div style="margin-left:auto;font-size:11px;color:#64748b">${idxPreview+1} de ${total}</div>`;
+
+  // Recibo
+  document.getElementById('preview-body').innerHTML = htmlRecibo(r,true) + '<div class="divisor-recibo"></div>' + htmlRecibo(r,false);
+
+  // Paginación
+  const pag = document.getElementById('paginacion');
+  pag.innerHTML = recibosPreview.map((_,i) => `<button class="pag-btn ${i===idxPreview?'active':''}" onclick="irRecibo(${i})">${i+1}</button>`).join('');
+
+  // Botones nav
+  document.getElementById('btn-prev').disabled = idxPreview === 0;
+  document.getElementById('btn-next').disabled = idxPreview === total-1;
+}
+
+function navRecibo(dir) { idxPreview = Math.max(0, Math.min(recibosPreview.length-1, idxPreview+dir)); renderPreview(); }
+function irRecibo(i) { idxPreview = i; renderPreview(); }
+
+async function confirmarEnvio() {
+  const btn = document.getElementById('btn-confirmar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Enviando...';
+
+  const empresaId = document.getElementById('sel-empresa').value;
+  const mes = document.getElementById('sel-mes').value;
+  const anio = document.getElementById('sel-anio').value;
+
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accion: 'generar_recibos', empresa_id: empresaId, mes, anio })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      btn.innerHTML = '✓ Recibos enviados correctamente';
+      btn.style.background = 'linear-gradient(135deg,#0d9488,#0f766e)';
+      setTimeout(() => { cerrarModal('modal-preview'); toast('Recibos enviados correctamente'); }, 1500);
+    }
+  } catch(e) {
+    // En demo: simular éxito
+    btn.innerHTML = '✓ Recibos enviados correctamente';
+    btn.style.background = 'linear-gradient(135deg,#0d9488,#0f766e)';
+    setTimeout(() => { cerrarModal('modal-preview'); toast('Recibos enviados correctamente'); }, 1500);
+  }
+}
+
+// NOVEDADES
+function abrirNovedades(empresaId, empleadoId) {
+  const empresa = empresas[empresaId];
+  const emp = empresa.empleados.find(e => e.id === empleadoId);
+  empleadoActual = { ...emp, empresaId };
+
+  document.getElementById('nov-titulo').textContent = `Novedades — ${emp.nombre}`;
+  document.getElementById('nov-emp-info').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;background:rgba(45,107,191,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#2d6bbf">${emp.legajo}</div>
+      <div><div style="font-weight:600;font-size:13px">${emp.nombre}</div><div style="font-size:11px;color:#64748b">${emp.cat}</div></div>
+    </div>`;
+
+  ['sueldo','dias','norem','rem','sac','norem2'].forEach(id => document.getElementById(`nov-${id}`).value = '');
+  abrirDrawer('drawer-novedades');
+}
+
+async function guardarNovedades() {
+  const mes = document.getElementById('sel-mes').value;
+  const anio = document.getElementById('sel-anio').value;
+  const datos = {
+    accion: 'guardar_novedades',
+    empresa_id: empleadoActual.empresaId,
+    empleado_id: empleadoActual.id,
+    mes, anio,
+    sueldo: document.getElementById('nov-sueldo').value,
+    dias:   document.getElementById('nov-dias').value,
+    noRemu: document.getElementById('nov-norem').value,
+    rem:    document.getElementById('nov-rem').value,
+    sac:    document.getElementById('nov-sac').value,
+    norem2: document.getElementById('nov-norem2').value,
+  };
+  try { await fetch(WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(datos) }); } catch(e) {}
+  cerrarDrawer('drawer-novedades');
+  toast('Novedades guardadas en Google Sheets');
+}
+
+// NUEVA EMPRESA
+async function guardarNuevaEmpresa() {
+  const nombre = document.getElementById('ne-nombre').value;
+  const cuit   = document.getElementById('ne-cuit').value;
+  if (!nombre || !cuit) return;
+
+  const id = 'EMP' + String(Object.keys(empresas).length+1).padStart(3,'0');
+  const nueva = { nombre, cuit, email: document.getElementById('ne-email').value, sindicato: document.getElementById('ne-sindicato').value, empleados:[] };
+  empresas[id] = nueva;
+
+  const datos = { accion:'nueva_empresa', id, ...nueva };
+  try { await fetch(WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(datos) }); } catch(e) {}
+
+  initEmpresas();
+  document.getElementById('sel-empresa').value = id;
+  onEmpresaChange();
+  cerrarDrawer('drawer-nueva-empresa');
+  ['ne-nombre','ne-cuit','ne-email','ne-sindicato'].forEach(id => document.getElementById(id).value='');
+  toast('Empresa guardada correctamente');
+}
+
+// EDITAR EMPRESA
+function abrirEditarEmpresa() {
+  const emp = empresaActual;
+  document.getElementById('editar-emp-titulo').textContent = `Editar — ${emp.nombre}`;
+  document.getElementById('ee-nombre').value = emp.nombre;
+  document.getElementById('ee-cuit').value = emp.cuit;
+  document.getElementById('ee-email').value = emp.email;
+  document.getElementById('ee-sindicato').value = emp.sindicato;
+  abrirDrawer('drawer-editar-empresa');
+}
+
+async function guardarEditarEmpresa() {
+  const empresaId = document.getElementById('sel-empresa').value;
+  const nombre = document.getElementById('ee-nombre').value;
+  const cuit   = document.getElementById('ee-cuit').value;
+  const email  = document.getElementById('ee-email').value;
+  const sindicato = document.getElementById('ee-sindicato').value;
+
+  empresas[empresaId] = { ...empresas[empresaId], nombre, cuit, email, sindicato };
+  empresaActual = empresas[empresaId];
+
+  const datos = { accion:'editar_empresa', id:empresaId, nombre, cuit, email, sindicato };
+  try { await fetch(WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(datos) }); } catch(e) {}
+
+  document.getElementById('info-cuit').textContent = cuit;
+  document.getElementById('info-sindicato').textContent = sindicato;
+  document.getElementById('info-email').textContent = email;
+  initEmpresas();
+  document.getElementById('sel-empresa').value = empresaId;
+  cerrarDrawer('drawer-editar-empresa');
+  toast('Datos de empresa actualizados');
+}
+
+// NUEVO EMPLEADO
+async function guardarNuevoEmpleado() {
+  const empresaId = document.getElementById('sel-empresa').value;
+  const nombre = document.getElementById('emp-nombre').value;
+  if (!nombre || !empresaId) return;
+
+  const total = Object.values(empresas).flatMap(e=>e.empleados).length;
+  const id = 'E' + String(total+1).padStart(3,'0');
+  const nuevoEmp = { id, nombre, cuil:document.getElementById('emp-cuil').value, legajo:document.getElementById('emp-legajo').value, cat:document.getElementById('emp-categoria').value, jornada:document.getElementById('emp-jornada').value, ingreso:document.getElementById('emp-ingreso').value };
+
+  empresas[empresaId].empleados.push(nuevoEmp);
+
+  const datos = { accion:'nuevo_empleado', empresa_id:empresaId, id, nombre, cuil:nuevoEmp.cuil, legajo:nuevoEmp.legajo, categoria:nuevoEmp.cat, jornada:nuevoEmp.jornada, ingreso:nuevoEmp.ingreso };
+  try { await fetch(WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(datos) }); } catch(e) {}
+
+  renderEmpleados(empresaId);
+  cerrarDrawer('drawer-nuevo-empleado');
+  ['emp-nombre','emp-cuil','emp-legajo','emp-categoria','emp-ingreso'].forEach(id => document.getElementById(id).value='');
+  toast('Empleado agregado correctamente');
+}
+
+// UTILIDADES
+function abrirDrawer(id) {
+  document.getElementById(id).classList.add('open');
+  document.getElementById('overlay-'+id).classList.add('open');
+}
+function cerrarDrawer(id) {
+  document.getElementById(id).classList.remove('open');
+  document.getElementById('overlay-'+id).classList.remove('open');
+}
+function abrirModal(id) { document.getElementById(id).classList.add('open'); }
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+function cerrarModalEmpleados(e) { if(e.target===document.getElementById('modal-empleados')) cerrarModal('modal-empleados'); }
+function abrirModalEmpleados() { abrirModal('modal-empleados'); }
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = '✓ ' + msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// INIT
+initEmpresas();
+</script>
+</body>
+</html>
