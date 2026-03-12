@@ -398,42 +398,40 @@
 // ============================================================
 // CONFIGURACIÓN — CAMBIAR ESTA URL POR LA DE TU N8N
 // ============================================================
-const WEBHOOK_URL = 'https://n8n.srv1334126.hstgr.cloud/webhook/rd-consultores'; // ← cambiar cuando configures n8n
+const WEBHOOK_URL = 'https://TU_WEBHOOK_N8N.com/webhook/rd-consultores'; // ← cambiar cuando configures n8n
 
 // ============================================================
 // DATOS EN MEMORIA (se cargan desde n8n en producción)
 // ============================================================
-let empresas = {
-  EMP001: { nombre:"JORGE MICELOTTA", cuit:"20-11299390-9", sindicato:"Gastronómicos (CCT 389/04)", email:"micelotta@email.com",
-    empleados:[
-      {id:"E001",legajo:"4", nombre:"AMARILLA JOHANNA BEATRIZ", cat:"MOZO/A",jornada:"REDUCIDA_50",ingreso:"24/08/16",cuil:"27-28765432-1"},
-      {id:"E002",legajo:"14",nombre:"VELTRI YANINA ESTER",      cat:"MOZO/A",jornada:"REDUCIDA_50",ingreso:"01/10/24",cuil:"27-31234567-2"},
-      {id:"E003",legajo:"15",nombre:"FERNANDEZ SOL MARIANA",    cat:"MOZO/A",jornada:"REDUCIDA_50",ingreso:"15/04/22",cuil:"27-29876543-3"},
-      {id:"E004",legajo:"18",nombre:"BERNAL DIANA STEFANY",     cat:"MOZO/A",jornada:"REDUCIDA_50",ingreso:"01/02/24",cuil:"27-33456789-4"},
-      {id:"E005",legajo:"19",nombre:"TORRES NATALIA MARCELA",   cat:"MOZO/A",jornada:"REDUCIDA_50",ingreso:"01/02/24",cuil:"27-30987654-5"},
-      {id:"E006",legajo:"22",nombre:"ALVES ROSA ESTER",         cat:"MOZO/A",jornada:"REDUCIDA_50",ingreso:"01/10/24",cuil:"27-32109876-6"},
-    ]},
-  EMP002: { nombre:"RESTAURANTE LOS PINOS", cuit:"30-71234567-8", sindicato:"Gastronómicos (CCT 389/04)", email:"lopinos@email.com",
-    empleados:[
-      {id:"E007",legajo:"1",nombre:"GOMEZ CARLOS ALBERTO",cat:"COCINERO",jornada:"COMPLETA",ingreso:"01/03/20",cuil:"20-25432198-7"},
-      {id:"E008",legajo:"2",nombre:"DIAZ MARIA LAURA",    cat:"MOZO/A",  jornada:"COMPLETA",ingreso:"15/06/21",cuil:"27-28543210-8"},
-    ]}
-};
+let empresas = {};
 
 let empresaActual = null;
 let empleadoActual = null;
 let recibosPreview = [];
 let idxPreview = 0;
 
-// Inicializar select de empresas
-function initEmpresas() {
+// Cargar empresas desde n8n
+async function initEmpresas() {
   const sel = document.getElementById('sel-empresa');
-  sel.innerHTML = '<option value="">— Seleccioná una empresa —</option>';
-  Object.entries(empresas).forEach(([id, e]) => {
-    const opt = document.createElement('option');
-    opt.value = id; opt.textContent = e.nombre;
-    sel.appendChild(opt);
-  });
+  sel.innerHTML = '<option value="">⏳ Cargando empresas...</option>';
+  try {
+    const res = await fetch(EMPRESAS_URL);
+    const data = await res.json();
+    if (data.ok && data.empresas) {
+      empresas = data.empresas;
+      sel.innerHTML = '<option value="">— Seleccioná una empresa —</option>';
+      Object.entries(empresas).forEach(([id, e]) => {
+        const opt = document.createElement('option');
+        opt.value = id; opt.textContent = e.nombre;
+        sel.appendChild(opt);
+      });
+    } else {
+      sel.innerHTML = '<option value="">❌ Error al cargar empresas</option>';
+    }
+  } catch(e) {
+    sel.innerHTML = '<option value="">❌ No se pudo conectar con n8n</option>';
+    console.error(e);
+  }
 }
 
 function onEmpresaChange() {
@@ -773,5 +771,4 @@ function toast(msg) {
 initEmpresas();
 </script>
 </body>
-
 </html>
