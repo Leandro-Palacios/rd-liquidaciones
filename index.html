@@ -345,7 +345,7 @@ function calcularRecibo(emp, empresa, mes, anio) {
   var totalHaberes = totalRem + noRem + otroNoRem;
   var jub = totalRem * 0.11;
   var ley = totalRem * 0.03;
-  var obraSoc = totalRem * 0.03;
+  var obraSoc = emp.jornada === 'REDUCIDA_50' ? sueldoBasico * 0.06 : totalRem * 0.03;
   var sind = totalRem * 0.025;
   var seg = totalRem * 0.01;
   var totalDesc = jub + ley + obraSoc + sind + seg;
